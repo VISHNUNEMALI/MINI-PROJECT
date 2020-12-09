@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+    <head>
+  <!-- Compiled and minified CSS -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+          <!-- Compiled and minified JavaScript -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <script src="https://kit.fontawesome.com/a81368914c.js"></script>
+        <script>
+            const logout = () =>{
+                localStorage.removeItem('email');
+                window.location='home.html'
+            }
+
+            const viewTutors = () =>{
+                const url = "http://localhost:3001/admin/allTutors"
+                fetch(url).then(res=>res.json())
+                .then(data=>{
+                    createTable(data)
+                })
+            }
+            const createTable = (data)=>{
+                console.log(data)
+                let rows = '';
+                data.forEach(u => {
+                    rows += `<tr>
+                                <td><b>${u.name}</b></td>
+                                <td><b>${u.email}</b></td>
+                                <td><b>${u.subject}</b></td>
+                                <td><input type="button" value="Delete Tutor" onclick="deleteTutor('${u._id}')"/></td>
+                            </tr>`
+                });
+                const _table = `<table>
+                                <tr>
+                                    <th style="color:red">NAME</th>
+                                    <th style="color:red">EMAIL</th>
+                                    <th style="color:red">SUBJECT</th>
+                                    <th style="color:red">ACTIONS</th>
+                                </tr>
+                                ${rows}
+                            </table>`
+                document.getElementById('Data').innerHTML = _table;
+            }
+            const deleteTutor=(id)=>{
+                console.log(id)
+                const url = "http://localhost:3001/admin/deleteTutor/"+id
+                fetch(url,{
+                    method:'DELETE'
+                }).
+                then(res=>res.json())
+                .then(data=>{
+                    viewTutors()
+                })
+            }    
+
+            const viewStudents = () =>{
+                const url = "http://localhost:3001/admin/allStudents"
+                fetch(url).then(res=>res.json())
+                .then(data=>{
+                    console.log(data)
+                    createTableForStudents(data)
+                })
+            }
+            const createTableForStudents = (data)=>{
+                console.log(data)
+                let rows = '';
+                data.forEach(u => {
+                    rows += `<tr>
+                                <td><b>${u.name}</b></td>
+                                <td><b>${u.email}</b></td>
+                                <td><b>${u.contactno}</b></td>
+                                <td><input type="button" value="Delete Student" onclick="deleteStudent('${u._id}')"/></td>
+                            </tr>`
+                });
+                const _table = `<table>
+                                <tr>
+                                    <th style="color:red">Name</th>
+                                    <th style="color:red">Email</th>
+                                    <th style="color:red">Contact Number</th>
+                                    <th style="color:red">Actions</th>
+                                </tr>
+                                ${rows}
+                            </table>`
+                document.getElementById('Data').innerHTML = _table;
+            }
+            const deleteStudent=(id)=>{
+                console.log(id)
+                const url = "http://localhost:3001/admin/deleteStudent/"+id
+                fetch(url,{
+                    method:'DELETE'
+                }).
+                then(res=>res.json())
+                .then(data=>{
+                    viewStudents()
+                })
+            }    
+            
+            const addAdmin = () =>{
+                const email = localStorage.getItem('email')
+                const _form = `
+                    <div>
+                                <h2 style="text-align: center;margin-top: 10%;">Add Admin</h2>
+                                <form>
+                                    <div class="input-div one">
+                                        <div class="i">
+                                                <i class="fas fa-user"></i>
+                                        </div>
+                                        <div class="div">
+                                            <h5> Name</h5>
+                                            <input id="name" type="text" class="input" >
+                                        </div>
+                                    </div>
+                                    <div class="input-div one">
+                                        <div class="i">
+                                                <i class="fas fa-envelope"></i>
+                                        </div>
+                                        <div class="div">
+                                            <h5> Email</h5>
+                                            <input id="email" type="email" class="input" >
+                                        </div>
+                                    </div>
+                                    <div class="input-div one">
+                                        <div class="i">
+                                            <i class="fas fa-lock"></i>
+                                        </div>
+                                        <div class="div">
+                                            <h5>Password</h5>
+                                            <input id="password" type="password" class="input">
+                                        </div>
+                                    </div>
+                                    <input type="button" class="btn" value="save" onclick="saveAdmin()">
+                                    <input type="button" class="btn" value="Go back" onclick="viewTutors()">
+                                </form>
+                            </div>`
+                            document.getElementById('Data').innerHTML = _form;
+                
+            }
+            const saveAdmin = () =>{
+                const name=document.getElementById('name').value
+                const email = document.getElementById('email').value
+                const password = document.getElementById('password').value
+
+                const url = "http://localhost:3001/admin/addAdmin"
+                fetch(url,{
+                    method:'POST',
+                    headers:{                            
+                            'content-type':'application/json'
+                    },
+                    body: JSON.stringify({
+                        'name':name,
+                        'email':email,
+                        'password':password
+					})     
+                }).then(res=>res.json())
+                .then(data=>{
+                    
+                    if(data.message === 'admin added'){
+                        const message = `<h2 style="text-align: center;margin-top: 10%;">Admin Added successfully</h2>`
+                        document.getElementById('Data').innerHTML = message
+                        return
+                    }
+                    else{
+                        const message = `<h2 style="text-align: center;margin-top: 10%;">admin not added ! Please try again</h2>`
+                        document.getElementById('Data').innerHTML = message
+                    
+                        return
+                    }
+                })    
+
+            }
+        
+        </script>
+        <title>
+            Admin Dashboard
+        </title>
+    </head>
+    <body onload="viewTutors()" style="background-image: url('../img/bg\ \(1\).png'); background-repeat: no-repeat;">
+        <div class="container">
+            <div>
+                <div class="row">
+                <div class="col">
+                    <button class="btn" type="submit" name="action" onclick="viewTutors()">view Tutors</button>
+                </div>
+                <div class="col">
+                    <button class="btn" type="submit" name="action" onclick="viewStudents()">view Students</button>
+                </div>
+                <div class="col">
+                    <button class="btn" type="submit" name="action" onclick="addAdmin()">Add Admin</button>
+                </div>
+                <div class="col">
+                    <button class="btn right" type="submit" name="action" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <div id='Data'>
+
+        </div>
+    </body>
+</html>

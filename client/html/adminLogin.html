@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Online Tutor Management System</title>
+	<link rel="stylesheet" type="text/css" href="../css/style.css">
+	<link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
+	<script src="https://kit.fontawesome.com/a81368914c.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script>
+		const login = () =>{
+			console.log(document.getElementById('Email').value+" ")
+			const email = document.getElementById('Email').value;
+			const password = document.getElementById('Password').value;
+			console.log(email+" "+password)
+		
+			const url="http://localhost:3001/admin/signin";
+			
+			fetch(url,{
+				method:'POST',
+				headers:
+					{
+						'content-type':'application/json'
+					},
+					body: JSON.stringify({
+						'email':email,
+						'password':password
+					})
+			})
+			.then(res=>res.json())
+			.then(data=>{
+				console.log(data)
+				if(data.message === 'Valid Admin'){
+					if(localStorage.getItem("email") == null){
+						localStorage.setItem('email',email)
+						window.location='adminDashboard.html'
+					}
+					else{
+						localStorage.clear()
+						alert("Please sign in again")
+						window.location='adminLogin.html'
+					}
+				}
+				else{
+					alert("OOPS! Invalid Credentials")
+					window.location='adminLogin.html'
+				}
+			})
+		}
+	</script>
+</head>
+<body>
+	<img class="wave" src="../img/wave.png">
+	<div class="container">
+		<div class="img">
+			<img src="../img/bg.svg">
+		</div>
+		<div class="login-content">
+			<form>
+				<img src="../img/avatar.svg">
+				<h2 class="title">Welcome Admin</h2>
+           		<div class="input-div one">
+           		   <div class="i">
+           		   		<i class="fas fa-user"></i>
+           		   </div>
+           		   <div class="div">
+           		   		<h5>Email</h5>
+           		   		<input id ="Email" type="text" class="input">
+           		   </div>
+           		</div>
+           		<div class="input-div pass">
+           		   <div class="i"> 
+           		    	<i class="fas fa-lock"></i>
+           		   </div>
+           		   <div class="div">
+           		    	<h5>Password</h5>
+           		    	<input id="Password" type="password" class="input">
+            	   </div>
+            	</div>
+            	<!-- <a href="#">Forgot Password?</a> -->
+				<input type="button" class="btn" value="Login" onclick="login()">
+				<a href="home.html"><- Go Back to home page</a>
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript" src="../js/main.js"></script>
+</body>
+</html>
